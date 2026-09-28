@@ -1,0 +1,124 @@
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { api } from '../services/api';
+
+export function MovieForm() {
+  const navigate = useNavigate();
+  
+  const [titulo, setTitulo] = useState('');
+  const [ano, setAno] = useState('');
+  const [duracao, setDuracao] = useState('');
+  const [sinopse, setSinopse] = useState('');
+  const [urlPoster, setUrlPoster] = useState('');
+  const [erro, setErro] = useState('');
+
+  async function handleCreateMovie(e: React.FormEvent) {
+    e.preventDefault();
+    setErro('');
+
+    try {
+      // Gera o ID único automaticamente para o Pydantic/FastAPI aceitar
+      const idAutomatico = crypto.randomUUID();
+
+      await api.post('/movies', {
+        id_filme: idAutomatico,
+        titulo: titulo,
+        ano_lancamento: Number(ano),
+        duracao_minutos: Number(duracao),
+        sinopse: sinopse,
+        url_poster: urlPoster || null,
+      });
+      
+      // Se o cadastro der certo, redireciona para o catálogo na página inicial
+      navigate('/');
+    } catch (err) {
+      const error = err as any;
+      console.error(error);
+      
+      if (error.response?.data?.detail) {
+        const detalhes = error.response.data.detail;
+        if (Array.isArray(detalhes)) {
+          const camposErro = detalhes.map((d: any) => d.loc[d.loc.length - 1]).join(', ');
+          setErro(`O backend rejeitou o cadastro. Verifique os campos: ${camposErro}`);
+        } else {
+          setErro('Erro de validação no backend.');
+        }
+      } else {
+        setErro('Erro ao cadastrar o filme. Verifique se o servidor backend está rodando.');
+      }
+    }
+  }
+
+  return (
+    <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '600px', margin: '0 auto' }}>
+      <Link to="/" style={{ textDecoration: 'none', color: '#007bff' }}>← Voltar ao Catálogo</Link>
+      
+      <h1 style={{ marginTop: '20px' }}>Cadastrar Novo Filme</h1>
+      
+      <form onSubmit={handleCreateMovie} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+        <div>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Título</label>
+          <input 
+            type="text" 
+            value={titulo} 
+            onChange={e => setTitulo(e.target.value)} 
+            required 
+            style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
+          />
+        </div>
+
+        <div style={{ display: 'flex', gap: '15px' }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Ano de Lançamento</label>
+            <input 
+              type="number" 
+              value={ano} 
+              onChange={e => setAno(e.target.value)} 
+              required 
+              style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Duração (minutos)</label>
+            <input 
+              type="number" 
+              value={duracao} 
+              onChange={e => setDuracao(e.target.value)} 
+              required 
+              style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>URL do Poster (Opcional)</label>
+          <input 
+            type="url" 
+            value={urlPoster} 
+            onChange={e => setUrlPoster(e.target.value)} 
+            style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
+          />
+        </div>
+
+        <div>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Sinopse</label>
+          <textarea 
+            value={sinopse} 
+            onChange={e => setSinopse(e.target.value)} 
+            required 
+            style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc', minHeight: '100px' }}
+          />
+        </div>
+
+        {erro && <p style={{ color: 'red', margin: '0', fontWeight: 'bold' }}>{erro}</p>}
+
+        <button 
+          type="submit" 
+          style={{ padding: '12px', background: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }}
+        >
+          Salvar Filme
+        </button>
+      </form>
+    </div>
+  );
+}

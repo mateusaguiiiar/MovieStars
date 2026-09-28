@@ -1,6 +1,3 @@
-Peço desculpas pela falha na comunicação. Aqui está a documentação completa em **um único bloco de código Markdown (`README.md`)**, integrando toda a profundidade e a estrutura do projeto de referência com as especificidades exatas do que construímos no seu MVP:
-
-```markdown
 # MovieStars — Sistema de Avaliação e Gestão de Filmes
 
 Módulo completo de gerenciamento e avaliação de filmes desenvolvido para a atividade do **Rocket Lab 2026-2**. A aplicação é uma SPA (*Single Page Application*) Full-Stack que permite navegar pelo catálogo, buscar filmes por título, visualizar detalhes e avaliações, cadastrar novos filmes (com geração automática de UUID), editar dados existentes, excluir registros e adicionar resenhas com notas de 1 a 5 estrelas.

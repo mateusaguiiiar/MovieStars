@@ -61,11 +61,10 @@ export function MovieDetail() {
         comentario: comentario,
       });
 
-      // Limpa o formulário e recarrega os detalhes para atualizar a lista e a média
       setComentario('');
       setNota('5');
       fetchMovieDetails();
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
       setErroAvaliacao('Erro ao enviar avaliação. Verifique os dados.');
     } finally {
@@ -73,14 +72,13 @@ export function MovieDetail() {
     }
   }
 
-  // FUNÇÃO DE EXCLUIR FILME
+  // Função para excluir o filme
   async function handleDeleteMovie() {
-    const confirmado = window.confirm('Tem certeza que deseja excluir este filme permanentemente?');
+    const confirmado = window.confirm('Tem a certeza de que deseja excluir este filme permanentemente?');
     if (!confirmado) return;
 
     try {
       await api.delete(`/movies/${id}`);
-      // Se der certo, redireciona para a página inicial
       navigate('/');
     } catch (error) {
       console.error('Erro ao excluir o filme:', error);
@@ -89,7 +87,7 @@ export function MovieDetail() {
   }
 
   if (loading) {
-    return <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>Carregando detalhes...</div>;
+    return <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>A carregar detalhes...</div>;
   }
 
   if (!movie) {
@@ -101,21 +99,32 @@ export function MovieDetail() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <Link to="/" style={{ textDecoration: 'none', color: '#007bff' }}>← Voltar ao Catálogo</Link>
         
-        {/* BOTÃO DE EXCLUIR */}
-        <button 
-          onClick={handleDeleteMovie}
-          style={{ background: '#dc3545', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-        >
-          🗑️ Excluir Filme
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          {/* Botão de Editar */}
+          <Link 
+            to={`/movies/edit/${movie.sk_movie_id}`}
+            style={{ background: '#ffc107', color: '#000', padding: '8px 12px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}
+          >
+            ✏️ Editar
+          </Link>
+
+          {/* Botão de Excluir */}
+          <button 
+            onClick={handleDeleteMovie}
+            style={{ background: '#dc3545', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+          >
+            🗑️ Excluir
+          </button>
+        </div>
       </div>
 
       <h1>{movie.titulo} ({movie.ano_lancamento})</h1>
-      {movie.nome_genero && <p style={{ color: '#555', fontStyle: 'italic' }}>Gênero: {movie.nome_genero}</p>}
+      {movie.nome_genero && <p style={{ color: '#555', fontStyle: 'italic' }}>Género: {movie.nome_genero}</p>}
       
       <div style={{ background: '#f8f9fa', padding: '15px', borderRadius: '8px', margin: '20px 0' }}>
         <h3>Sinopse</h3>
         <p>{movie.sinopse || 'Nenhuma sinopse cadastrada.'}</p>
+        {movie.duracao_minutos && <p style={{ margin: '5px 0' }}>Duração: {movie.duracao_minutos} minutos</p>}
         <p style={{ fontWeight: 'bold', marginTop: '10px' }}>
           ⭐ Média de Notas: {movie.media_notas ? movie.media_notas.toFixed(1) : 'Sem avaliações'}
         </p>
@@ -123,8 +132,7 @@ export function MovieDetail() {
 
       <hr style={{ margin: '30px 0', border: '0', borderTop: '1px solid #ddd' }} />
 
-      {/* SEÇÃO DE AVALIAÇÕES */}
-      <h2>Avaliações dos Usuários</h2>
+      <h2>Avaliações dos Utilizadores</h2>
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '30px' }}>
         {movie.reviews && movie.reviews.length > 0 ? (
@@ -139,7 +147,6 @@ export function MovieDetail() {
         )}
       </div>
 
-      {/* FORMULÁRIO DE NOVA AVALIAÇÃO */}
       <div style={{ background: '#e9ecef', padding: '20px', borderRadius: '8px' }}>
         <h3>Adicionar uma Resenha</h3>
         <form onSubmit={handleAddReview} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -164,7 +171,7 @@ export function MovieDetail() {
               value={comentario} 
               onChange={e => setComentario(e.target.value)} 
               required
-              placeholder="Escreva sua opinião sobre o filme..."
+              placeholder="Escreva a sua opinião sobre o filme..."
               style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc', minHeight: '80px' }}
             />
           </div>
@@ -176,7 +183,7 @@ export function MovieDetail() {
             disabled={enviando}
             style={{ padding: '10px', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
           >
-            {enviando ? 'Enviando...' : 'Enviar Avaliação'}
+            {enviando ? 'A enviar...' : 'Enviar Avaliação'}
           </button>
         </form>
       </div>
